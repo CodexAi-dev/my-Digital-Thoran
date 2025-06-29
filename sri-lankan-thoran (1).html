@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sri Lankan Digital Thoran</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thoran-container {
+            position: relative;
+            width: 700px;
+            height: 700px;
+            background: #000;
+            border-radius: 30px;
+            box-shadow: 0 0 50px #0ff4, 0 0 30px #fff2 inset;
+            border: 2px solid #0ff4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-structure {
+            position: relative;
+            width: 600px;
+            height: 600px;
+        }
+
+        .led-ring {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .outer-ring {
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+        .center-ring {
+            width: 180px;
+            height: 180px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .inner-ring {
+            width: 140px;
+            height: 140px;
+        }
+
+        #topRing {
+            left: 50%;
+            top: 10%;
+            transform: translate(-50%, 0);
+        }
+
+        #bottomRing {
+            left: 50%;
+            top: 70%;
+            transform: translate(-50%, 0);
+        }
+
+        #leftRing {
+            left: 10%;
+            top: 50%;
+            transform: translate(0, -50%);
+        }
+
+        #rightRing {
+            left: 70%;
+            top: 50%;
+            transform: translate(0, -50%);
+        }
+
+        .led-bulb {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #222;
+            border: 2px solid #333;
+            box-shadow: 0 0 5px #fff2;
+            transition: all 0.2s;
+        }
+
+        .led-bulb.on {
+            background: radial-gradient(circle, #fff 0%, var(--bulb-color, #ff0) 70%);
+            border-color: var(--bulb-color, #ff0);
+            box-shadow: 0 0 15px var(--bulb-color, #ff0), 0 0 25px var(--bulb-color, #ff0);
+            transform: scale(1.2);
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #0ff4;
+            z-index: 100;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #667eea99;
+        }
+
+        .bottom-section {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 50px;
+            background: #111;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffd70088;
+            box-shadow: 0 0 20px #ffd70055;
+        }
+
+        .title-text {
+            color: #ffd700;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #ffd70099;
+        }
+
+        .circle-card {
+            position: absolute;
+            left: 51%;
+            top: 51%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: #803c3c;
+            box-shadow: 0 0 15px rgba(112, 197, 8, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Example sizes for each card */
+        .outer-card {
+            width: 120px;
+            height: 120px;
+            background: #941515;
+            opacity: 0.2;
+        }
+
+        .center-card {
+            width: 145px;
+            height: 145px;
+            background: #c5d213;
+        }
+
+        .top-card,
+        .bottom-card,
+        .left-card,
+        .right-card {
+            width: 110px;
+            height: 110px;
+            background: #30aecd;
+        }
+
+        .spiral-bulb {
+            z-index: 2;
+        }
+
+        @media (max-width: 900px) {
+            .thoran-container {
+                width: 95vw;
+                height: 95vw;
+                min-width: 320px;
+                min-height: 320px;
+            }
+
+            .main-structure {
+                width: 80vw;
+                height: 80vw;
+                min-width: 250px;
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="thoran-container">
+        <div class="main-structure">
+            <div class="led-ring outer-ring" id="outerRing">
+                <div class="circle-card outer-card"></div>
+            </div>
+            <div class="led-ring center-ring" id="centerRing">
+                <div class="circle-card center-card">
+                    <img src="pngwing.com (18).png" alt="Buddha" style="width:80%;height:80%;border-radius:50%;">
+                </div>
+            </div>
+            <div class="led-ring inner-ring" id="topRing">
+                <div class="circle-card top-card">
+                    <img src="pngwing.com (18).png" alt="Top" style="width:80%;height:80%;border-radius:50%;">
+                </div>
+            </div>
+            <div class="led-ring inner-ring" id="bottomRing">
+                <div class="circle-card bottom-card">
+                    <img src="pngwing.com (18).png" alt="Bottom" style="width:80%;height:80%;border-radius:50%;">
+                </div>
+            </div>
+            <div class="led-ring inner-ring" id="leftRing">
+                <div class="circle-card left-card">
+                    <img src="pngwing.com (18).png" alt="Left" style="width:80%;height:80%;border-radius:50%;">
+                </div>
+            </div>
+            <div class="led-ring inner-ring" id="rightRing">
+                <div class="circle-card right-card">
+                    <img src="pngwing.com (18).png" alt="Right" style="width:80%;height:80%;border-radius:50%;">
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="control-panel">
+        <button class="control-btn" onclick="changePattern()">Next Pattern</button>
+        <button class="control-btn" onclick="toggleAnimation()">Toggle Anim</button>
+        <button class="control-btn" onclick="changeSpeed(-0.5)">Speed –</button>
+        <button class="control-btn" onclick="changeSpeed(0.5)">Speed +</button>
+        <button class="control-btn" onclick="changeColors()">Colors</button>
+        <button class="control-btn" onclick="masterToggle()">Master</button>
+        <button class="control-btn" onclick="randomMode()">Random</button>
+    </div>
+    <script>
+        // LED ring configuration
+        const rings = [
+            { id: 'outerRing', count: 60, radius: 290 },
+            { id: 'centerRing', count: 24, radius: 80 },
+            { id: 'topRing', count: 18, radius: 60 },
+            { id: 'bottomRing', count: 18, radius: 60 },
+            { id: 'leftRing', count: 18, radius: 60 },
+            { id: 'rightRing', count: 18, radius: 60 }
+        ];
+        let bulbs = [];
+        let animationSpeed = 1;
+        let animationActive = true;
+        let patternIndex = 0;
+        let colorMode = 0;
+        let masterOn = true;
+        let intervalId = null;
+
+        function getRandomColor() {
+            const colors = ['#ff0', '#0ff', '#f0f', '#0f0', '#f00', '#00f', '#fff', '#ffd700', '#ff69b4'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function createLEDBulbs(ringId, count, radius) {
+            const ring = document.getElementById(ringId);
+            // Remove only previous bulbs, keep circle-card
+            [...ring.querySelectorAll('.led-bulb')].forEach(bulb => bulb.remove());
+            const ringBulbs = [];
+            const center = ring.offsetWidth / 2;
+            for (let i = 0; i < count; i++) {
+                const bulb = document.createElement('div');
+                bulb.className = 'led-bulb';
+                bulb.dataset.index = i;
+                bulb.dataset.ring = ringId;
+                const angle = (2 * Math.PI / count) * i;
+                const x = center + radius * Math.cos(angle) - 5;
+                const y = center + radius * Math.sin(angle) - 5;
+                bulb.style.left = x + 'px';
+                bulb.style.top = y + 'px';
+                bulb.style.setProperty('--bulb-color', getRandomColor());
+                ring.appendChild(bulb);
+                ringBulbs.push(bulb);
+            }
+            return ringBulbs;
+        }
+
+        function init() {
+            bulbs = [];
+            setTimeout(() => { // Wait for layout
+                rings.forEach(ring => {
+                    bulbs = bulbs.concat(createLEDBulbs(ring.id, ring.count, ring.radius));
+                });
+                updatePattern();
+            }, 100);
+        }
+
+        // Patterns
+        const patterns = [
+            // Example for the wave pattern:
+            function wave() {
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', ((i + Math.floor(Date.now() / (50 * animationSpeed))) % 10) === 0 && masterOn);
+                });
+            },
+            function allOn() {
+                bulbs.forEach(bulb => bulb.classList.toggle('on', masterOn));
+            },
+            function alternate() {
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', ((i % 2) === (Math.floor(Date.now() / (500 * animationSpeed)) % 2)) && masterOn);
+                });
+            },
+            function chase() {
+                const pos = Math.floor(Date.now() / (80 * animationSpeed)) % bulbs.length;
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', (i === pos) && masterOn);
+                });
+            },
+            function random() {
+                bulbs.forEach(bulb => {
+                    bulb.classList.toggle('on', Math.random() > 0.7 && masterOn);
+                });
+            },
+            // Knight Rider (scanner) pattern
+            function knightRider() {
+                const len = bulbs.length;
+                const t = Math.floor(Date.now() / (40 * animationSpeed)) % (2 * len - 2);
+                let pos = t < len ? t : (2 * len - 2 - t);
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', (i === pos || i === pos - 1 || i === pos + 1) && masterOn);
+                });
+            },
+            // Buddha pattern: center and rings radiate out
+            function buddhaRadiate() {
+                // Find bulbs in each ring
+                const ringGroups = {};
+                bulbs.forEach(bulb => {
+                    const ring = bulb.dataset.ring;
+                    if (!ringGroups[ring]) ringGroups[ring] = [];
+                    ringGroups[ring].push(bulb);
+                });
+                const t = Math.floor(Date.now() / (300 * animationSpeed)) % 6;
+                Object.values(ringGroups).forEach((group, i) => {
+                    group.forEach(bulb => bulb.classList.toggle('on', (i === t) && masterOn));
+                });
+            },
+            // Pulse pattern
+            function pulse() {
+                const phase = Math.sin(Date.now() / (400 * animationSpeed));
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', phase > 0 && masterOn);
+                });
+            },
+            // Spiral sweep
+            function spiralSweep() {
+                const len = bulbs.length;
+                const t = Math.floor(Date.now() / (60 * animationSpeed)) % len;
+                bulbs.forEach((bulb, i) => {
+                    bulb.classList.toggle('on', (i <= t) && masterOn);
+                });
+            }
+        ];
+
+        function updatePattern() {
+            if (!animationActive) return;
+            patterns[patternIndex % patterns.length]();
+        }
+
+        function animate() {
+            updatePattern();
+            intervalId = requestAnimationFrame(animate);
+        }
+
+        function changePattern() {
+            patternIndex = (patternIndex + 1) % patterns.length;
+            document.querySelector('.control-btn').blur();
+        }
+
+        function toggleAnimation() {
+            animationActive = !animationActive;
+            if (animationActive) animate();
+            else cancelAnimationFrame(intervalId);
+        }
+
+        function changeSpeed(delta) {
+            animationSpeed = Math.max(0.1, Math.min(10, animationSpeed + delta));
+        }
+
+        function changeColors() {
+            bulbs.forEach(bulb => bulb.style.setProperty('--bulb-color', getRandomColor()));
+        }
+
+        function masterToggle() {
+            masterOn = !masterOn;
+        }
+
+        function randomMode() {
+            patternIndex = 4; // random pattern
+        }
+
+        function createSpiralLEDBulbs(options = {}) {
+            // Remove previous spiral bulbs
+            document.querySelectorAll('.spiral-bulb').forEach(b => b.remove());
+
+            const {
+                centerX = 300, // center of .main-structure (600x600)
+                centerY = 300,
+                spiralBulbs = 50,
+                spiralTurns = 2.5,
+                spiralSpacing = 12 // space between spiral arms
+            } = options;
+
+            const mainStructure = document.querySelector('.main-structure');
+            const maxRadius = 220; // how far spiral goes
+
+            for (let i = 0; i < spiralBulbs; i++) {
+                const t = i / (spiralBulbs - 1); // 0 to 1
+                const angle = spiralTurns * 2 * Math.PI * t;
+                const radius = spiralSpacing * angle;
+
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                const bulb = document.createElement('div');
+                bulb.className = 'led-bulb spiral-bulb';
+                bulb.style.left = (x - 5) + 'px';
+                bulb.style.top = (y - 5) + 'px';
+                bulb.style.setProperty('--bulb-color', getRandomColor());
+                mainStructure.appendChild(bulb);
+            }
+        }
+
+        function createRadialLEDBulbs(options = {}) {
+            // Remove previous radial bulbs
+            document.querySelectorAll('.radial-bulb').forEach(b => b.remove());
+
+            const mainStructure = document.querySelector('.main-structure');
+            const centerX = mainStructure.offsetWidth / 2;
+            const centerY = mainStructure.offsetHeight / 2;
+
+            const lines = 8; // 8 lines, two per gap
+            const bulbsPerLine = 7;
+
+            // These radii should match your card/ring sizes:
+            const centerCardRadius = 45;
+            const innerRingRadius = 70;
+            const outerRingRadius = 290;
+
+            const startRadius = centerCardRadius + 15;
+            const endRadius = outerRingRadius - 15;
+
+            const radialBulbs = [];
+
+            // For each gap between cards, draw two lines closer together
+            // Gaps are centered at 45°, 135°, 225°, 315°
+            // We'll offset each by -10° and +10° (in radians)
+            const gapCenters = [45, 135, 225, 315].map(deg => deg * Math.PI / 180);
+            const offset = 12 * Math.PI / 180; // 5 degrees in radians (closer)
+
+            for (let g = 0; g < gapCenters.length; g++) {
+                for (let o of [-offset, offset]) {
+                    const angle = gapCenters[g] + o;
+                    for (let b = 0; b < bulbsPerLine; b++) {
+                        const t = b / (bulbsPerLine - 1);
+                        const radius = startRadius + t * (endRadius - startRadius);
+
+                        // Skip bulbs that would overlap inner rings/cards
+                        if (radius > innerRingRadius - 20 && radius < innerRingRadius + 20) continue;
+
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+
+                        const bulb = document.createElement('div');
+                        bulb.className = 'led-bulb radial-bulb';
+                        bulb.style.left = (x - 5) + 'px';
+                        bulb.style.top = (y - 5) + 'px';
+                        bulb.style.setProperty('--bulb-color', getRandomColor());
+                        mainStructure.appendChild(bulb);
+                        radialBulbs.push(bulb);
+                    }
+                }
+            }
+
+            // Add radial bulbs to the main bulbs array so they animate
+            bulbs = bulbs.concat(radialBulbs);
+        }
+
+        function createLineLEDBulbsBetweenCircles(options = {}) {
+            // Remove previous line bulbs
+            document.querySelectorAll('.line-bulb').forEach(b => b.remove());
+
+            const mainStructure = document.querySelector('.main-structure');
+            const centerX = mainStructure.offsetWidth / 2;
+            const centerY = mainStructure.offsetHeight / 2;
+
+            // Angles for the lines (diagonals)
+            const angles = [45, 135, 225, 315].map(deg => deg * Math.PI / 180);
+
+            // Radii for the two circles (adjust as needed)
+            const innerRadius = 90;   // just outside center ring (centerRing radius + half its width)
+            const outerRadius = 290;  // matches outer ring
+
+            const step = 8; // Distance between bulbs in px (smaller = more bulbs)
+
+            const lineBulbs = [];
+
+            angles.forEach(angle => {
+                for (let radius = innerRadius; radius <= outerRadius; radius += step) {
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    const bulb = document.createElement('div');
+                    bulb.className = 'led-bulb line-bulb';
+                    bulb.style.left = (x - 5) + 'px';
+                    bulb.style.top = (y - 5) + 'px';
+                    bulb.style.setProperty('--bulb-color', getRandomColor());
+                    mainStructure.appendChild(bulb);
+                    lineBulbs.push(bulb);
+                }
+            });
+
+            // Add these bulbs to the bulbs array so they animate
+            bulbs = bulbs.concat(lineBulbs);
+        }
+
+        window.addEventListener('resize', init);
+
+        // Initialize
+        window.onload = () => {
+            init();
+            createRadialLEDBulbs(); // existing
+            createLineLEDBulbsBetweenCircles(); // <-- add this line
+            animate();
+        };
+    </script>
+</body>
+
+</html>
